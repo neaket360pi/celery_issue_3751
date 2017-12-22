@@ -1,0 +1,29 @@
+version: '2'
+services:
+  rabbitmq:
+    image: rabbitmq:3.6.1-management
+    restart: always
+#    ports:
+#      - 4369:4369
+#      - 5671:5671
+#      - 5672:5672
+#      - 25672:25672
+#      - 15672:15672
+  celery_worker_1:
+    build:
+      context: .
+    depends_on:
+      - rabbitmq
+    command: celery worker -c 2 -A celery_app.app
+  celery_worker_2:
+    build:
+      context: .
+    depends_on:
+      - rabbitmq
+    command: celery worker -c 2 -A celery_app.app
+  publisher:
+    build:
+      context: .
+    depends_on:
+      - rabbitmq
+    command: python3 -u publisher.py
